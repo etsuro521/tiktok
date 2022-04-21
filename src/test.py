@@ -1,3 +1,4 @@
+from cgi import print_arguments
 from tracemalloc import start
 from PIL import Image, ImageDraw
 
@@ -13,4 +14,4 @@ b_x = mask_im.size[0]
 start_x = int((b_x - i_x)/2)
 back_im.paste(im,(start_x,10))
 back_im.show()
-
+print('test')
