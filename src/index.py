@@ -1,17 +1,19 @@
 from PIL import Image, ImageDraw
+import numpy as np
 
 def make_circle(im,im_2r):
-    im_a = Image.new("L", im.size, 0)
-    draw = ImageDraw.Draw(im_a)
+    im_a = Image.new(im.mode, im.size,0)
+    mask = Image.new("L", im.size,0)
+    draw = ImageDraw.Draw(mask)
     draw.ellipse((0,0,im_2r,im_2r),fill=255)
+
     im_rgba = im.copy()
-    im_rgba.putalpha(im_a)
-    im_rgba_crop = im_rgba.crop((0,0,im_2r,im_2r))
-    return im_rgba_crop
+    im_a.paste(im_rgba,(0,0),mask)
+    return im_a
 
 def paste_to_back(pasted_im,im_2r):
     origin_back_im = Image.open("../img/back.jpg")
-    back_im = origin_back_im.convert("RGBA").copy()
+    back_im = Image.new(pasted_im.mode,(900,1600),(0,0,0))
     b_x,b_y = back_im.size
     start_x = int((b_x - im_2r)/2)
     start_y = int((b_y - im_2r)/4)
@@ -34,6 +36,7 @@ def main():
         k_im = s_im.rotate(i)
         p_im = paste_to_back(k_im,im_2r)
         im_list.append(p_im)
+        
 
     im_list[0].save("../img/g_im.gif", save_all=True, append_images=im_list[1:],optimize=True, duration=100, loop=0) 
 
