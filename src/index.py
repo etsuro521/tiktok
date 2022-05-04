@@ -2,21 +2,25 @@ from PIL import Image, ImageDraw
 import numpy as np
 
 def make_circle(im,im_2r):
-    im_a = Image.new(im.mode, im.size,0)
     mask = Image.new("L", im.size,0)
     draw = ImageDraw.Draw(mask)
-    draw.ellipse((0,0,im_2r,im_2r),fill=255)
-
+    draw.ellipse((0,0,im_2r-100,im_2r-100),fill=255)
     im_rgba = im.copy()
-    im_a.paste(im_rgba,(0,0),mask)
-    return im_a
 
-def paste_to_back(pasted_im,im_2r):
-    origin_back_im = Image.open("../img/back.jpg")
+    mask_r_size = im_2r+200
+    mask_r = Image.new(im.mode, (mask_r_size,mask_r_size),0)
+    draw = ImageDraw.Draw(mask_r)
+    draw.ellipse((0,0,mask_r_size,mask_r_size),(51,51,51))
+    start_x = int((mask_r_size - im.size[0]+100)/2)
+    start_y = int((mask_r_size - im.size[1]+100)/2)
+    mask_r.paste(im_rgba,(start_x,start_y),mask)
+    return mask_r
+
+def paste_to_back(pasted_im):
     back_im = Image.new(pasted_im.mode,(900,1600),(0,0,0))
     b_x,b_y = back_im.size
-    start_x = int((b_x - im_2r)/2)
-    start_y = int((b_y - im_2r)/4)
+    start_x = int((b_x - pasted_im.size[0])/2)
+    start_y = int((b_y - pasted_im.size[1])/4)
     back_im.paste(pasted_im,(start_x,start_y))
     return back_im
 
@@ -29,12 +33,12 @@ def main():
         im_2r = im_y
     else:
         im_2r = im_x
-
     im_list = []
     s_im = make_circle(im,im_2r)
+
     for i in range(0,360,1):
         k_im = s_im.rotate(i)
-        p_im = paste_to_back(k_im,im_2r)
+        p_im = paste_to_back(k_im)
         im_list.append(p_im)
         
 
